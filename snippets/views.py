@@ -1,16 +1,16 @@
 # snippets/views.py
 from django.contrib.auth.models import User
-from rest_framework import generics, permissions # new
-from rest_framework.decorators import api_view # new
-from rest_framework.response import Response # new
-from rest_framework.reverse import reverse # new
+from rest_framework import generics, permissions, renderers
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from .models import Snippet
-from .permissions import IsOwnerOrReadOnly # new
+from .permissions import IsOwnerOrReadOnly
 from .serializers import SnippetSerializer, UserSerializer
 
 
-@api_view(['GET']) # new
+@api_view(['GET'])
 def api_root(request, format=None):
     return Response({
         'users': reverse('user-list', request=request, format=format),
@@ -18,11 +18,20 @@ def api_root(request, format=None):
     })
 
 
+class SnippetHighlight(generics.GenericAPIView):
+    queryset = Snippet.objects.all()
+    renderer_classes = (renderers.StaticHTMLRenderer,)
+
+    def get(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
+
+
 class SnippetList(generics.ListCreateAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly,) # new
+                          IsOwnerOrReadOnly,)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -32,7 +41,7 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsOwnerOrReadOnly,) # new
+                          IsOwnerOrReadOnly,)
 
 
 class UserList(generics.ListAPIView):
