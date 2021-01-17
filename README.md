@@ -69,3 +69,4 @@ So I am at a loss for how to get this to work...
 
 
 PS. As far as I can tell, this is the official Django Rest Framework tutorial.
+PS2. I have asked this question on Reddit: https://www.reddit.com/r/djangolearning/comments/kz7pe2/reverse_does_not_work_in_django_rest_framework/
