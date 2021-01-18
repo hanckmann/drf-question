@@ -25,7 +25,7 @@ class User(AbstractUser):
     first_name = None  # type: ignore
     last_name = None  # type: ignore
 
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['email']
 
     # objects: UserManager = UserManager()  # type: ignore
 

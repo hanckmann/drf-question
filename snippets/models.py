@@ -1,4 +1,3 @@
-# snippets/models.py
 from django.contrib.auth import get_user_model
 from django.db import models
 from pygments import highlight
@@ -16,7 +15,6 @@ User = get_user_model()
 
 
 class Snippet(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=100, blank=True, default='')
     code = models.TextField()
     linenos = models.BooleanField(default=False)
@@ -24,6 +22,7 @@ class Snippet(models.Model):
     style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100)
     owner = models.ForeignKey(User, related_name='snippets', on_delete=models.CASCADE)
     highlighted = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ('created',)
