@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth import get_user_model
 
 from django.test import TestCase
+from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.reverse import reverse
 import factory
@@ -11,7 +12,7 @@ from .factories import UserFactory
 
 User = get_user_model()
 
-USERS_URL = reverse('snippet-list')
+USERS_URL = reverse('user-list')
 
 
 class TestUserModel(TestCase):
@@ -30,25 +31,18 @@ class TestUserModel(TestCase):
     # def test__user_str_representation_to_be_email(self):
     #     self.assertEqual(str(self.user), self.user.email)
 
-    # def test_get_user_successful(self):
-    #     # payload = {
-    #     #     'email': 'test3@test.nl',
-    #     #     'username': 'test3',
-    #     #     'name': 'Full name'
-    #     # }
-    #     # self.client.post(USERS_URL, payload)
-    #     # exists = User.objects.filter(
-    #     #     username=self.user.username
-    #     # ).exists()
-    #     # self.assertTrue(exists)
-
-    #     self.assertEqualself.user
-    #     self.assertEqualself.superuser
-
-    #     self.assertEqual(len(result), 1)
-    #     self.assertEqual(result[0].title, 'TITLE1')
-    #     self.assertEqual(result[0].code, 'CODE ONE')
-    #     self.assertEqual(result[0].style, None)
+    def test_post_user_successful(self):
+        payload = {
+            'email': 'test3@test.nl',
+            'username': 'test3',
+            'name': 'Full name'
+        }
+        ret = self.client.post(USERS_URL, payload)
+        exists = User.objects.filter(
+            email=payload['email']
+        ).exists()
+        self.assertEqual(ret.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+        self.assertFalse(exists)
 
     @factory.django.mute_signals(post_save)
     def test_user_permissions(self):

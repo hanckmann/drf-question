@@ -17,28 +17,29 @@ class TestSnippetModel(TestCase):
 
     @factory.django.mute_signals(post_save)
     def setUp(self):
-        self.user = UserFactory(email='user@example.com')
+        self.user = UserFactory(username='test', email='user@example.com')
         self.client = APIClient()
         self.client.force_authenticate(self.user)
 
+    @factory.django.mute_signals(post_save)
     def test_create_snippet_successful(self):
+        print(SNIPPETS_URL)
         payload = {
             'title': 'TITLE1',
             'code': 'CODE ONE',
             'linenos': False,
-            'language': 'Erlang',
-            'style': None
+            'language': 'erlang',
         }
-        self.client.post(SNIPPETS_URL, payload)
+        ret = self.client.post(SNIPPETS_URL, payload)
         exists = Snippet.objects.filter(
             owner=self.user
         ).exists()
-        self.assertTrue(exists)
         self.client.post(SNIPPETS_URL, payload)
         result = Snippet.objects.filter(
             owner=self.user
         ).all()
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0].title, 'TITLE1')
-        self.assertEqual(result[0].code, 'CODE ONE')
-        self.assertEqual(result[0].style, None)
+        self.assertEqual(ret.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(exists)
+        self.assertEqual(result[0].title, payload['title'])
+        self.assertEqual(result[0].code, payload['code'])
+        self.assertEqual(result[0].language, payload['language'])
